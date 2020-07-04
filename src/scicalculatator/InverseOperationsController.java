@@ -597,7 +597,16 @@ public class InverseOperationsController implements Initializable {
     public void displayAnswer(ActionEvent event){
         // Result Screen
         TextField resultScreen=this.mainController.getResultScreen();
+        // Calculation Screen
+        TextField calculationScreen=this.mainController.getCalculationScreen();
+        
+        String calculationScreenContent=calculationScreen.getText();
+        
         String answer=model.compute(Model.mathematicalExpression);
+        
+        if(calculationScreenContent.contains("\u2610") || calculationScreenContent.contains("\u207B\u221A")){
+            answer="";
+        }
         
         resultScreen.setText(answer);
     }

@@ -480,7 +480,16 @@ public class StandardOperationsController implements Initializable {
     public void displayAnswer(ActionEvent event){
         // Result Screen
         TextField resultScreen=this.mainController.getResultScreen();
+        // Calculation Screen
+        TextField calculationScreen=this.mainController.getCalculationScreen();
+        
+        String calculationScreenContent=calculationScreen.getText();
+        
         String answer=model.compute(Model.mathematicalExpression);
+        
+        if(calculationScreenContent.contains("\u2610") || calculationScreenContent.contains("\u207B\u221A")){
+            answer="";
+        }
         
         resultScreen.setText(answer);
     }
@@ -780,8 +789,6 @@ public class StandardOperationsController implements Initializable {
 
                             Model.nthRootIncomplete=0;
                             Model.numbDotPressed=0;
-                            
-                            System.out.println("Got here");
 
                         }else{
                             // remove last char from calc screen and mathExprs Model.nthRootIncomplete=0;
@@ -807,6 +814,9 @@ public class StandardOperationsController implements Initializable {
         }
         
         String answer=model.compute(Model.mathematicalExpression);
+        if(calculationScreenContent.contains("\u2610") || calculationScreenContent.contains("\u207B\u221A")){
+            answer="";
+        }
         calculationScreen.setText(calculationScreenContent);
         resultScreen.setText(answer);
         

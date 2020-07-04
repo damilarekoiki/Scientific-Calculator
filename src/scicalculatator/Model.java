@@ -329,6 +329,14 @@ public class Model {
                 && expression.charAt(expression.length()-1)!='!' ){
             return "";
         }
+        if(expression.contains("?")) return "";
+        if(expression.length()>=2){
+            for(int i=0;i<expression.length();i++){
+                if(expression.charAt(i)=='.' && expression.charAt(i+1)=='@') return "";
+                if(isOperator(expression.charAt(i)) && expression.charAt(i+1)=='-' && expression.charAt(i+1)=='@') return "";
+            }
+        }
+        
         Stack<String> numberStack=new Stack <>();
         String operator="";
         String number="";
