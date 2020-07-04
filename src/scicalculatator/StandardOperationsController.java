@@ -547,10 +547,10 @@ public class StandardOperationsController implements Initializable {
                 Model.mathematicalExpression=model.replaceChar(matExprsLength-4, matExprsLength, "", Model.mathematicalExpression);
                 
             }else if(model.isPi(calculationScreenLastChar)){
-                // Remove last char from calc screeen and remove Last 3.14159265359 from matExprs
+                // Remove last char from calc screeen and remove Last 3.1415926536 from matExprs
                 calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
-                Model.mathematicalExpression=model.replaceChar(matExprsLength-13, matExprsLength, "", Model.mathematicalExpression);
-            
+                Model.mathematicalExpression=model.replaceChar(matExprsLength-12, matExprsLength, "", Model.mathematicalExpression);
+                System.out.println("After PI deleted: "+Model.mathematicalExpression);
             }else if(calculationScreenLastChar=='e'){
                 
                 if(model.endsWithNumbExp(calculationScreenContent)){
