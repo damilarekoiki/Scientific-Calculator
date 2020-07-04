@@ -154,7 +154,7 @@ public class InverseOperationsController implements Initializable {
         
         if(!model.isNumb(calculationScreenLastChar) && calculationScreenLastChar!=')' 
                 && calculationScreenLastChar!='e'&& calculationScreenLastChar!='!'
-                && model.isPi(calculationScreenLastChar)){
+                && !model.isPi(calculationScreenLastChar)){
             return;
         }
         
@@ -172,7 +172,7 @@ public class InverseOperationsController implements Initializable {
         
         
         Model.nthRootIncomplete++;
-        System.out.println(Model.mathematicalExpression);
+        System.out.println("When Root Pressed: "+Model.mathematicalExpression);
         calculationScreen.setText(calculationScreenContent);
     }
     

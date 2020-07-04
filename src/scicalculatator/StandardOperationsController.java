@@ -470,6 +470,8 @@ public class StandardOperationsController implements Initializable {
                 calculationScreenContent=calculationScreenContent.concat(parenthesis);
                 Model.mathematicalExpression=Model.mathematicalExpression.concat(parenthesis);
                 Model.numbParenthesisOpened--;
+                System.out.println("Parenth: "+parenthesis);
+                System.out.println("Mat exprs: "+Model.mathematicalExpression);
                 break;
             default:
                 break;
@@ -495,7 +497,6 @@ public class StandardOperationsController implements Initializable {
     }
     
     public void handleDel(ActionEvent event){
-        
         // Calculation Screen
         TextField calculationScreen=this.mainController.getCalculationScreen();
         // Content Of Calculation Screen
@@ -541,33 +542,7 @@ public class StandardOperationsController implements Initializable {
             Model.mathematicalExpression="";
             resultScreenContent="";
         }else{
-            if(calculationScreenLastChar=='%'){
-                // Remove last char from calc screeen and remove Last /100 from matExprs
-                calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
-                Model.mathematicalExpression=model.replaceChar(matExprsLength-4, matExprsLength, "", Model.mathematicalExpression);
-                
-            }else if(model.isPi(calculationScreenLastChar)){
-                // Remove last char from calc screeen and remove Last 3.1415926536 from matExprs
-                calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
-                Model.mathematicalExpression=model.replaceChar(matExprsLength-12, matExprsLength, "", Model.mathematicalExpression);
-                System.out.println("After PI deleted: "+Model.mathematicalExpression);
-            }else if(calculationScreenLastChar=='e'){
-                
-                if(model.endsWithNumbExp(calculationScreenContent)){
-                    // Remove last char from calc screeen and remove Last *10^ from matExprs
-                    calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
-                    Model.mathematicalExpression=model.replaceChar(matExprsLength-4, matExprsLength, "", Model.mathematicalExpression);
-
-                    
-                }else{
-                    // remove last char from calc screen and remove last 2.71828182846
-                    calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
-                    Model.mathematicalExpression=model.replaceChar(matExprsLength-13, matExprsLength, "", Model.mathematicalExpression);
-
-                    
-                }
-                
-            }else if(calculationScreenLastChar=='('){
+            if(calculationScreenLastChar=='('){
                 if(calculationScreenContentLength>=2){
                     if(model.isTrigFunction(matExprs2ToLastChar) ){
                         // From calc screen keep removing until you get to t, c, s or l inclusive
@@ -608,6 +583,7 @@ public class StandardOperationsController implements Initializable {
                 Model.numbDotPressed=0;
                 
             }else if(model.isNumb(matExprsLastChar) || matExprsLastChar==')'){
+                System.out.println("Got here: "+matExprsLastChar);
                 // remove last char from calc screen and mathExprs
                 // scan backwars to you find an operator or ( StringEnd, if you encounter "." then numDotPressed=1
                 
@@ -646,47 +622,77 @@ public class StandardOperationsController implements Initializable {
                     }
                 }
 
-                if(encounteredOp){
-                    if(!Model.mathematicalExpression.contains("(") && 
-                        !Model.mathematicalExpression.contains("@")){
-                        removeNumb=true;
-                    }else{
-                        for(int i=opIndex-1;i>=0;i--){
-                            if(Model.mathematicalExpression.charAt(i)=='(' && i-1>=0){
-                                if(Model.mathematicalExpression.charAt(i-1)=='@'){
+                if(!Model.mathematicalExpression.contains("@")){
+                    removeNumb=true;
+                }else{
+                    for(int i=Model.mathematicalExpression.length()-1;i>=0;i--){
+                        if(Model.mathematicalExpression.charAt(i)=='@'){
+                            if(i-1>0){ // If Root is not the first symbol
+                                if(Model.mathematicalExpression.charAt(i-1)=='.' || 
+                                        Model.mathematicalExpression.charAt(i-1)=='?' || 
+                                    model.isNumb(Model.mathematicalExpression.charAt(i-1))){
 
                                     removeNumb=false;
                                     break;
-                                }else if(Model.mathematicalExpression.charAt(i-1)!='@'){
+                                }else if(Model.mathematicalExpression.charAt(i-1)=='-'){
+                                    int calculationScreenRootIndex=calculationScreenContent.lastIndexOf("\u221A");
+                                    int calculationScreenBeforeRootIndex=calculationScreenRootIndex-1;
+
+                                    char calculationScreenBeforeRoot=calculationScreenContent.charAt(calculationScreenBeforeRootIndex);
+
+                                    if(calculationScreenBeforeRoot=='\u207B'){
+                                        removeNumb=false;
+                                        break;
+                                    }else{
+                                        removeNumb=true;
+                                        break;
+                                    }
+                                }else{
                                     removeNumb=true;
                                     break;
                                 }
-
-                            }
-                        }
-                    }
-                    
-                    
-                }else{
-                    if(!Model.mathematicalExpression.contains("(") && 
-                        !Model.mathematicalExpression.contains("@")){
-                        removeNumb=true;
-                    }else{
-                        for(int i=opIndex-1;i>=0;i--){
-                            if(Model.mathematicalExpression.charAt(i)=='@'){
-
-                                removeNumb=false;
+                            }else{ // If root is the first symbol
+                                removeNumb=true;
                                 break;
                             }
                         }
                     }
-                    
                 }
+                
+                
                 
                 if(removeNumb){
                     
-                    calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
-                    Model.mathematicalExpression=model.replaceLastChar("", Model.mathematicalExpression);
+                    if(calculationScreenLastChar=='%'){
+                        // Remove last char from calc screeen and remove Last /100 from matExprs
+                        calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
+                        Model.mathematicalExpression=model.replaceChar(matExprsLength-4, matExprsLength, "", Model.mathematicalExpression);
+
+                    }else if(model.isPi(calculationScreenLastChar)){
+                        // Remove last char from calc screeen and remove Last 3.1415926536 from matExprs
+                        calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
+                        Model.mathematicalExpression=model.replaceChar(matExprsLength-12, matExprsLength, "", Model.mathematicalExpression);
+                        System.out.println("After PI deleted: "+Model.mathematicalExpression);
+                    }else if(calculationScreenLastChar=='e'){
+
+                        if(model.endsWithNumbExp(calculationScreenContent)){
+                            // Remove last char from calc screeen and remove Last *10^ from matExprs
+                            calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
+                            Model.mathematicalExpression=model.replaceChar(matExprsLength-4, matExprsLength, "", Model.mathematicalExpression);
+
+
+                        }else{
+                            // remove last char from calc screen and remove last 2.71828182846
+                            calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
+                            Model.mathematicalExpression=model.replaceChar(matExprsLength-13, matExprsLength, "", Model.mathematicalExpression);
+
+
+                        }
+
+                    }else{
+                        calculationScreenContent=model.replaceLastChar("", calculationScreenContent);
+                        Model.mathematicalExpression=model.replaceLastChar("", Model.mathematicalExpression);
+                    }
                     
                     for(int j=Model.mathematicalExpression.length()-1;j>=0;j--){
                         if(Model.mathematicalExpression.charAt(j)=='.'){
@@ -804,7 +810,9 @@ public class StandardOperationsController implements Initializable {
                     
                 }
 
-                
+                if(matExprsLastChar==')'){
+                    Model.numbParenthesisOpened++;
+                }
             
             }else{
                 // remove last char from both calc screen and matExprs
