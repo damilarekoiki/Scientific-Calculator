@@ -13,8 +13,8 @@ import java.util.Stack;
  * @author user
  */
 public class Model {
-    String[] operatorsArray={"+","-","x","247"};
-    String[] matExprsOperatorsArray={"+","-","*","/"};
+    String[] operatorsArray={"+","-","x","247","^"};
+    String[] matExprsOperatorsArray={"+","-","*","/","^"};
     static String mathematicalExpression="";
     
     static int numbDotPressed=0;
