@@ -324,6 +324,7 @@ public class Model {
     
     
     public String compute(String expression){
+        System.out.println("Expression: "+expression);
         if(expression.isEmpty()) return "";
         if(!isNumb(expression.charAt(expression.length()-1)) && expression.charAt(expression.length()-1)!=')'
                 && expression.charAt(expression.length()-1)!='!' ){
@@ -354,21 +355,34 @@ public class Model {
                 
                 if(!number.isEmpty()){
                     if(token=='@'){ // To know if number is nth of root
-                       System.out.println("nth root: "+number);
-
-                        System.out.println(number);
+                        
                         operatorStack.push(number+","+token); // Push nth root
+                        System.out.println("op pek: "+operatorStack.peek());
                         
                     }else{
+                        System.out.println("Hey: "+token);
                         if(!operatorStack.empty()){
                             if(isTrigFunction(operatorStack.peek().charAt(0))){
-                                
                                 numberStack.push(applyTrig(operatorStack.pop(), number));
-                                
+                                if(!operatorStack.empty()){
+                                    if(operatorStack.peek().contains("@")){
+                                        String[] root=operatorStack.pop().split(",");
+                                        String nthRoot=root[0];
+                                        numberStack.push(applyRoot(nthRoot, number));
+                                    }
+                                }
+
                             }else if(operatorStack.peek().contains("@")){
                                 String[] root=operatorStack.pop().split(",");
                                 String nthRoot=root[0];
                                 numberStack.push(applyRoot(nthRoot, number));
+                                
+                                if(!operatorStack.empty()){
+                                    if(isTrigFunction(operatorStack.peek().charAt(0))){
+                                        numberStack.push(applyTrig(operatorStack.pop(), number));
+                                    }
+                                }
+                                
                             }else{
                                 numberStack.push(number);
                             }
@@ -381,9 +395,10 @@ public class Model {
                     number="";
                     
                     if(!selectionStack.empty()){
-                        numberStack.push(applySelection(selectionStack.pop(),numberStack.pop(),numberStack.pop()));
+                        if(!numberStack.empty()) numberStack.push(applySelection(selectionStack.pop(),numberStack.pop(),numberStack.pop()));
                     }
                     if(isNumb(token) && i==expression.length()-1){
+                        
                         if(!operatorStack.empty() && numberStack.size()>=2){
                             while(!"(".equals(operatorStack.peek())){
                                 
@@ -404,12 +419,29 @@ public class Model {
                         // Check if operator stack peek is trig or root,
                         // then replace number stack peek with trig or root of number
                         if(!operatorStack.empty()){
+                            
                             if(isTrigFunction(operatorStack.peek().charAt(0))){
-                                numberStack.push(applyTrig(operatorStack.pop(), numberStack.pop()));
+                                if(!numberStack.empty()) numberStack.push(applyTrig(operatorStack.pop(), numberStack.pop()));
+                                if(!operatorStack.empty()){
+                                    if(operatorStack.peek().contains("@")){
+                                        String[] root=operatorStack.pop().split(",");
+                                        String nthRoot=root[0];
+                                        if(!numberStack.empty()) numberStack.push(applyRoot(nthRoot, numberStack.pop()));
+                                    }
+                                }
+
                             }else if(operatorStack.peek().contains("@")){
+                                System.out.println("Number top: "+numberStack.peek());
                                 String[] root=operatorStack.pop().split(",");
                                 String nthRoot=root[0];
-                                numberStack.push(applyRoot(nthRoot, numberStack.pop()));
+                                if(!numberStack.empty()) numberStack.push(applyRoot(nthRoot, numberStack.pop()));
+                                
+                                if(!operatorStack.empty()){
+                                    if(isTrigFunction(operatorStack.peek().charAt(0))){
+                                        if(!numberStack.empty()) numberStack.push(applyTrig(operatorStack.pop(), numberStack.pop()));
+                                    }
+                                }
+                                
                             }
                         }
                         
@@ -440,11 +472,26 @@ public class Model {
                 // then replace number stack peek with trig or root of number
                 if(!operatorStack.empty()){
                     if(isTrigFunction(operatorStack.peek().charAt(0))){
-                        numberStack.push(applyTrig(operatorStack.pop(), numberStack.pop()));
+                        if(!numberStack.empty()) numberStack.push(applyTrig(operatorStack.pop(), numberStack.pop()));
+                        if(!operatorStack.empty()){
+                            if(operatorStack.peek().contains("@")){
+                                String[] root=operatorStack.pop().split(",");
+                                String nthRoot=root[0];
+                                if(!numberStack.empty()) numberStack.push(applyRoot(nthRoot, numberStack.pop()));
+                            }
+                        }
+
                     }else if(operatorStack.peek().contains("@")){
                         String[] root=operatorStack.pop().split(",");
                         String nthRoot=root[0];
-                        numberStack.push(applyRoot(nthRoot, numberStack.pop()));
+                        if(!numberStack.empty()) numberStack.push(applyRoot(nthRoot, numberStack.pop()));
+
+                        if(!operatorStack.empty()){
+                            if(isTrigFunction(operatorStack.peek().charAt(0))){
+                                if(!numberStack.empty()) numberStack.push(applyTrig(operatorStack.pop(), numberStack.pop()));
+                            }
+                        }
+
                     }
                 }
                 
@@ -487,7 +534,7 @@ public class Model {
                 
             }if(token=='!'){
                 
-                numberStack.push(applyFactorial(numberStack.pop()));
+                if(!numberStack.empty()) numberStack.push(applyFactorial(numberStack.pop()));
                 
             }if(isTrigFunction(token)){
                 
@@ -699,7 +746,7 @@ public class Model {
         double n= new Double(nthRoot);
         double x= new Double(number);
         double p=0.0001;
-        if(x<0){
+        if(x<0 && n%2.0==0.0){
             return "-1"; // Return error
         }
         if(x==0) return "0";
